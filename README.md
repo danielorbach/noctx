@@ -55,6 +55,42 @@ $ golangci-lint run
 golangci-lint run --enable-only noctx
 ```
 
+## Configuration
+
+### Excluding Functions
+
+You can exclude specific functions from noctx checks using the `exclude` flag. This is useful when you want to allow certain functions without context, such as when using the `log/slog` package where context variants are optional.
+
+#### With go vet
+
+```sh
+$ go vet -vettool=`which noctx` -noctx.exclude="log/slog.*,(*log/slog.Logger).*" ./...
+```
+
+#### With golangci-lint
+
+In your `.golangci.yml`:
+
+```yaml
+linters:
+  enable:
+    - noctx
+
+linters-settings:
+  noctx:
+    # Exclude specific functions using glob patterns (* wildcards)
+    exclude:
+      # Exclude all log/slog package functions
+      - "log/slog.*"
+      # Exclude all methods on log/slog.Logger
+      - "(*log/slog.Logger).*"
+      # Exclude specific functions
+      - "log/slog.Debug"
+      - "log/slog.Info"
+```
+
+The exclusion patterns support standard glob patterns with `*` wildcards.
+
 ## net/http package
 ### Rules
 https://github.com/sonatard/noctx/blob/b768dab1764733f7f69c5075b7497eff4c58f260/noctx.go#L41-L50
